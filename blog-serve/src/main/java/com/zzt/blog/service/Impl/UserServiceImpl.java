@@ -89,6 +89,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (!verifyPassword(loginDTO.getPassword(), user.getPassword())) {
             throw new BusinessException(ErrorCode.PASSWORD_ERROR);
         }
+        //更新最后登录时间
+        user.setLastLogin(new Date());
+        getBaseMapper().updateById(user);
         return user;
     }
 

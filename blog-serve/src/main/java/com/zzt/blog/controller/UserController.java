@@ -9,8 +9,10 @@ import com.zzt.blog.service.UserRoleService;
 import com.zzt.blog.service.UserService;
 import com.zzt.blog.util.JwtUtils;
 import com.zzt.blog.util.Result;
+import com.zzt.blog.vo.UserVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,8 +38,17 @@ public class UserController {
 
     @GetMapping("/{id}")
     @Operation(summary = "获取用户详情")
-    public User getUserById(@PathVariable Long id) {
-        return userService.getUserById(id);
+    public Result<UserVO> getUserById(@PathVariable Long id) {
+        if(id== null) {
+            return Result.error(500, "用户ID为空");
+        }
+        User user = userService.getUserById(id);
+        if(user== null) {
+            return Result.error(500, "用户不存在");
+        }
+        UserVO userVO = new UserVO();
+        BeanUtils.copyProperties(user, userVO);
+        return Result.success("获取成功", userVO);
     }
 
     @PostMapping("/register")
