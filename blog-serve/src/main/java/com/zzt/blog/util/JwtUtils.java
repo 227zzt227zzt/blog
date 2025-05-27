@@ -1,5 +1,6 @@
 package com.zzt.blog.util;
 
+import com.zzt.blog.entity.UserRole;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Component;
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -28,6 +30,18 @@ public class JwtUtils {
     // 从令牌中获取用户名
     public String getUsernameFromToken(String token) {
         return getClaimFromToken(token, Claims::getSubject);
+    }
+    // 从令牌中获取角色
+    public List<UserRole> getRoleFromToken(String token) {
+        return getClaimFromToken(token, claims -> {
+            List<Map<String, Object>> roleList = (List<Map<String, Object>>) claims.get("role");
+            return roleList.stream().map(roleMap -> {
+                UserRole userRole = new UserRole();
+                userRole.setUserId(Long.valueOf(roleMap.get("userId").toString()));
+                userRole.setRoleId(Integer.valueOf(roleMap.get("roleId").toString()));
+                return userRole;
+            }).toList();
+        });
     }
 
     // 从令牌中获取过期日期
@@ -74,9 +88,10 @@ public class JwtUtils {
         final String tokenUsername = getUsernameFromToken(token);
         return (tokenUsername.equals(username) && !isTokenExpired(token));
     }
-    public String generateToken(String username, Long userId) {
+    public String generateToken(String username, Long userId, List<UserRole> role) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", userId);
+        claims.put("role", role);
         return doGenerateToken(claims, username);
     }
 }

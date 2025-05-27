@@ -30,6 +30,8 @@ public class SecurityConfig {
                 .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/doc.html", "/webjars/**").permitAll()
                 // 允许登录和注册接口
                 .requestMatchers("/users/login", "/users/register").permitAll()
+                    //  允许管理员访问 /admin/** 接口
+                    .requestMatchers("/admin/**").hasRole("ADMIN")
                 // 其他请求需要认证
                 .anyRequest().authenticated()
             )

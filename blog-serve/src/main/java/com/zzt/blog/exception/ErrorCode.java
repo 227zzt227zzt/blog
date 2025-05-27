@@ -16,6 +16,7 @@ public enum ErrorCode {
     UNAUTHORIZED(401, "未授权"),
     FORBIDDEN(403, "禁止访问"),
     NOT_FOUND(404, "资源不存在"),
+    TOKEN_INVALID(4011, "token无效"),
     
     // 业务错误码 (1000-1999)
     USER_NOT_FOUND(1001, "用户不存在"),

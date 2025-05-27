@@ -55,7 +55,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public void registerUser(RegisterDTO user) {
+    public User registerUser(RegisterDTO user) {
         // 检查用户名是否已存在
         if (this.lambdaQuery().eq(User::getUsername, user.getUsername()).exists()) {
             throw new BusinessException(ErrorCode.USERNAME_ALREADY_EXISTS);
@@ -70,6 +70,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         newUser.setCreateTime(new Date());
         newUser.setStatus(UserStatus.NORMAL);
         getBaseMapper().insert(newUser);
+        // 注册成功后，分配默认角色
+        return newUser;
     }
     @Override
     public User loginUser(LoginDTO loginDTO) {

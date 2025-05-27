@@ -4,6 +4,8 @@ import com.zzt.blog.dto.user.LoginDTO;
 import com.zzt.blog.dto.user.RegisterDTO;
 import com.zzt.blog.dto.user.UpdateUserDTO;
 import com.zzt.blog.entity.User;
+import com.zzt.blog.entity.UserRole;
+import com.zzt.blog.service.UserRoleService;
 import com.zzt.blog.service.UserService;
 import com.zzt.blog.util.JwtUtils;
 import com.zzt.blog.util.Result;
@@ -13,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -28,6 +31,9 @@ public class UserController {
     @Autowired
     private JwtUtils jwtUtils;
 
+    @Autowired
+    private UserRoleService userRoleService;
+
     @GetMapping("/{id}")
     @Operation(summary = "获取用户详情")
     public User getUserById(@PathVariable Long id) {
@@ -40,7 +46,15 @@ public class UserController {
         if(user== null) {
             return Result.error(500, "用户为空");
         }
-        userService.registerUser(user);
+       User user1 =  userService.registerUser(user);
+        if(user1== null) {
+            return Result.error(500, "注册失败");
+        }
+        //  返回结果,赋予角色
+        UserRole userRole = new UserRole();
+        userRole.setUserId(user1.getId());
+        userRole.setRoleId(2);
+        userRoleService.assignRole(userRole);
         return Result.success("注册成功");
     }
 
@@ -52,9 +66,12 @@ public class UserController {
         }
 
         User user = userService.loginUser(loginDTO);
-        
+        if(user== null) {
+            return Result.error(500, "登录失败");
+        }
+        List<UserRole> roles = userRoleService.getRolesByUserId(user.getId());
         // 生成JWT令牌
-        String token = jwtUtils.generateToken(user.getUsername(), user.getId());
+        String token = jwtUtils.generateToken(user.getUsername(), user.getId(), roles);
         
         // 构建返回结果
         Map<String, Object> result = new HashMap<>();

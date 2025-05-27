@@ -9,7 +9,7 @@ import com.zzt.blog.entity.User;
 public interface UserService {
     User getUserById(Long id);
     User getUserByUsername(String username);
-    void registerUser(RegisterDTO user);
+    User registerUser(RegisterDTO user);
     User loginUser(LoginDTO loginDTO);
     void updateUser(UpdateUserDTO user);
     void disableUser(Long userId);
