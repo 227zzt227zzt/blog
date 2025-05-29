@@ -5,13 +5,16 @@ import com.zzt.blog.dto.user.RegisterDTO;
 import com.zzt.blog.dto.user.UpdateUserDTO;
 import com.zzt.blog.entity.User;
 import com.zzt.blog.entity.UserRole;
+import com.zzt.blog.service.CaptchaService;
 import com.zzt.blog.service.UserRoleService;
 import com.zzt.blog.service.UserService;
 import com.zzt.blog.util.JwtUtils;
 import com.zzt.blog.util.Result;
 import com.zzt.blog.vo.UserVO;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -68,14 +71,17 @@ public class UserController {
         userRoleService.assignRole(userRole);
         return Result.success("注册成功");
     }
-
+    @Autowired
+    private CaptchaService captchaService;
     @PostMapping("/login")
     @Operation(summary = "登录用户")
-    public Result<Map<String, Object>> loginUser(@RequestBody LoginDTO loginDTO) {
-        if(loginDTO== null) {
-            return Result.error(500, "登录信息为空");
+    public Result<Map<String, Object>> loginUser(@RequestBody LoginDTO loginDTO
+            , HttpSession session ) {
+        // 先校验验证码
+        boolean isValid = captchaService.validateCaptcha(session.getId(), loginDTO.getCaptcha());
+        if (!isValid) {
+            return Result.error(401, "验证码错误");
         }
-
         User user = userService.loginUser(loginDTO);
         if(user== null) {
             return Result.error(500, "登录失败");
@@ -83,7 +89,6 @@ public class UserController {
         List<UserRole> roles = userRoleService.getRolesByUserId(user.getId());
         // 生成JWT令牌
         String token = jwtUtils.generateToken(user.getUsername(), user.getId(), roles);
-        
         // 构建返回结果
         Map<String, Object> result = new HashMap<>();
         result.put("token", token);
@@ -91,7 +96,6 @@ public class UserController {
         
         return Result.success("登录成功", result);
     }
-
     @PutMapping
     @Operation(summary = "更新用户信息")
     public void updateUser(@RequestBody UpdateUserDTO user) {
@@ -107,6 +111,5 @@ public class UserController {
         result.put("size", size);
         result.put("users", userService.getUserPage(page, size));
         return Result.success("获取成功", result);
-}
-
+    }
 }

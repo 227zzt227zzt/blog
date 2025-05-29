@@ -14,7 +14,6 @@
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
           <entry name="$USER_HOME$/Downloads/apache-maven-3.8.4-bin/apache-maven-3.8.4/repository/org/projectlombok/lombok/1.18.38/lombok-1.18.38.jar" />
-          <entry name="$USER_HOME$/Downloads/apache-maven-3.8.4-bin/apache-maven-3.8.4/repository/org/projectlombok/lombok/1.18.38/lombok-1.18.38.jar" />
         </processorPath>
         <module name="blog-serve" />
       </profile>

@@ -11,6 +11,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 /**
  * Spring Security配置
+ * @author 227
  */
 @Configuration
 @EnableWebSecurity
@@ -29,7 +30,7 @@ public class SecurityConfig {
                 // 允许访问Swagger/Knife4j相关资源
                 .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/doc.html", "/webjars/**").permitAll()
                 // 允许登录和注册接口
-                .requestMatchers("/users/login", "/users/register").permitAll()
+                .requestMatchers("/users/login", "/users/register","/captcha/**").permitAll()
                     //  允许管理员访问 /admin/** 接口
                     .requestMatchers("/admin/**").hasRole("ADMIN")
                 // 其他请求需要认证

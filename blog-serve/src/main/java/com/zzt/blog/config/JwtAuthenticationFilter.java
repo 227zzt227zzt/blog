@@ -46,7 +46,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String requestPath = request.getServletPath();
         
         // 对于登录和注册接口，直接放行，不进行JWT验证
-        if ("/users/login".equals(requestPath) || "/users/register".equals(requestPath)) {
+        if ("/users/login".equals(requestPath) || "/users/register".equals(requestPath) || "/captcha/**".equals(requestPath)) {
             filterChain.doFilter(request, response);
             return;
         }
