@@ -29,8 +29,8 @@ public class CaptchaServiceImpl implements CaptchaService {
         LineCaptcha captcha = CaptchaUtil.createLineCaptcha(200, 100);
         String code = captcha.getCode();
         
-        // 存储到 Redis，设置10分钟过期
-        redisTemplate.opsForValue().set(key, code, 10, TimeUnit.MINUTES);
+        // 存储到 Redis，设置1分钟过期
+        redisTemplate.opsForValue().set(key, code, 1, TimeUnit.MINUTES);
         
         return captcha.getImageBase64Data();
     }
@@ -44,6 +44,6 @@ public class CaptchaServiceImpl implements CaptchaService {
     @Override
     public boolean validateCaptcha(String key, String userInput) {
         String storedCode = redisTemplate.opsForValue().get(key);
-        return userInput != null && userInput.equalsIgnoreCase(storedCode);
+        return userInput != null && userInput.equals(storedCode);
     }
 }

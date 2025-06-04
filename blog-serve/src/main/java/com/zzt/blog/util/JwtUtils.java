@@ -8,6 +8,7 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
@@ -20,10 +21,13 @@ import java.util.function.Function;
  */
 @Component
 public class JwtUtils {
-
+    // 假设，你现在启动了项目，那么这个key就是一个随机的值，这个时候有人 登录来生成jwt，是按照这个密钥生成的
+    // 如果说这时候重启了，那么就会重新生成另一个随机的值，这时候校验jwt的密钥就对不上
     // 令牌密钥
-    private static final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-    
+//    private static final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+    //private static final Key KEY = Keys.secretKeyFor(SignatureAlgorithm.HS512);
+    private static final String SECRET_KEY = "weqoprjfgcioskanmfoerwu90418329023iwrifdndcoisuf9023i9-fjn9012213412fcdsafe";
+    private static final SignatureAlgorithm SIGNATURE_ALGORITHM = SignatureAlgorithm.HS512;
     // 令牌过期时间（毫秒）
     private static final long JWT_TOKEN_VALIDITY = 24 * 60 * 60 * 1000;
 
@@ -31,6 +35,7 @@ public class JwtUtils {
     public String getUsernameFromToken(String token) {
         return getClaimFromToken(token, Claims::getSubject);
     }
+
     // 从令牌中获取角色
     public List<UserRole> getRoleFromToken(String token) {
         return getClaimFromToken(token, claims -> {
@@ -57,7 +62,9 @@ public class JwtUtils {
 
     // 从令牌中获取所有声明
     private Claims getAllClaimsFromToken(String token) {
-        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
+        return Jwts.parser().setSigningKey(SECRET_KEY.getBytes(StandardCharsets.UTF_8))
+                .parseClaimsJws(token)
+                .getBody();
     }
 
     // 检查令牌是否已过期
@@ -79,7 +86,7 @@ public class JwtUtils {
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY))
-                .signWith(key)
+                .signWith(SIGNATURE_ALGORITHM, SECRET_KEY.getBytes(StandardCharsets.UTF_8))
                 .compact();
     }
 
@@ -88,6 +95,7 @@ public class JwtUtils {
         final String tokenUsername = getUsernameFromToken(token);
         return (tokenUsername.equals(username) && !isTokenExpired(token));
     }
+
     public String generateToken(String username, Long userId, List<UserRole> role) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", userId);

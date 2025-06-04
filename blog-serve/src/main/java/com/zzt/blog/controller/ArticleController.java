@@ -1,18 +1,20 @@
 package com.zzt.blog.controller;
 
-import com.zzt.blog.dto.ArticleDTO;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.zzt.blog.dto.article.ArticleDTO;
+import com.zzt.blog.dto.article.ArticleUpdateDTO;
 import com.zzt.blog.entity.Article;
 import com.zzt.blog.service.ArticleService;
-import com.zzt.blog.util.Page;
 import com.zzt.blog.util.Result;
+import com.zzt.blog.vo.ArticleVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
+import java.util.Date;
 
 /**
  * @author 227
@@ -26,16 +28,16 @@ public class ArticleController {
 
     @GetMapping
     @Operation(summary = "获取文章列表")
-    public Result<Page<Article>> listArticles(@Parameter(description = "页码", required = true) @RequestParam(defaultValue = "1") Integer currentPage, @Parameter(description = "每页数量", required = true) @RequestParam(defaultValue = "3") Integer size) {
-        //获取文章列表，然后分页返回
-        List<Article> articles = articleService.listArticles();
-        Page<Article> page = Page.listToPage(articles, currentPage, size);
-        return Result.success(page);
+    public Result<Page<Article>> listArticles(
+            @Parameter(description = "页码", required = true) @RequestParam(defaultValue = "1") Integer currentPage,
+            @Parameter(description = "每页数量", required = true) @RequestParam(defaultValue = "10") Integer size) {
+        Page<Article> articlePage = articleService.pageArticles(currentPage, size);
+        return Result.success(articlePage);
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "获取文章详情")
-    public Result<Article> getArticleById(@PathVariable Long id) {
+    public Result<ArticleVO> getArticleById(@PathVariable Long id) {
         if (id == null) {
             return Result.error("参数错误");
         }
@@ -46,24 +48,20 @@ public class ArticleController {
 
 
     @PostMapping
-    @Operation(summary = "保存文章")
-    public Result<Void> saveArticle(@RequestBody ArticleDTO article) {
+    @Operation(summary = "新增文章")
+    public Result<ArticleDTO> saveArticle(@RequestBody ArticleDTO article) {
         if (article == null) {
             return Result.error("参数错误");
         }
         articleService.saveArticle(article);
-        return Result.success();
+        return Result.success("新增文章成功",article);
 
     }
 
     @PutMapping
     @Operation(summary = "更新文章")
-    public Result<Void> updateArticle(@RequestBody Article article) {
-        if (article == null) {
-            return Result.error("参数错误");
-        }
-        articleService.updateArticle(article);
-        return Result.success();
+    public Result<Article> updateArticle(@RequestBody ArticleUpdateDTO article) {
+        return Result.success(articleService.updateArticle(article));
     }
 
     @DeleteMapping("/{id}")
@@ -75,4 +73,25 @@ public class ArticleController {
         articleService.deleteArticle(id);
         return Result.success();
     }
+
+    @PostMapping("/uploadCover")
+    @Operation(summary = "上传文章封面")
+    public Result<String> uploadCover(
+            @Parameter(description = "封面图片") @RequestParam("file") MultipartFile file) {
+
+        try {
+            String coverUrl = articleService.uploadCoverImage(file);
+            return Result.success("上传成功",coverUrl);
+        } catch (Exception e) {
+            return Result.error(e.getMessage());
+        }
+    }
+    @GetMapping("/getArticlePageByUserId")
+    @Operation(summary = "获取用户文章列表")
+    public Result<Page<Article>> getArticlePageByUserId(@RequestParam(value = "userId") Long userId,
+                                                        @RequestParam(value = "currentPage",defaultValue = "1") Long currentPage,
+                                                        @RequestParam(value = "size",defaultValue = "10") Long size){
+        return Result.success(articleService.getArticlePageByUserId(userId,currentPage,size));
+    }
+
 }

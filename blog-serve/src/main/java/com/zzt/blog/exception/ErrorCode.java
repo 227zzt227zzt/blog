@@ -17,6 +17,7 @@ public enum ErrorCode {
     FORBIDDEN(403, "禁止访问"),
     NOT_FOUND(404, "资源不存在"),
     TOKEN_INVALID(4011, "token无效"),
+    SAVE_FILE_ERROR(5001, "保存文件失败"),
     
     // 业务错误码 (1000-1999)
     USER_NOT_FOUND(1001, "用户不存在"),
@@ -27,7 +28,8 @@ public enum ErrorCode {
     // 文章相关错误码 (2000-2999)
     ARTICLE_NOT_FOUND(2001, "文章不存在"),
     CATEGORY_NOT_FOUND(2002, "分类不存在"),
-    
+    FILE_TOO_LARGE(2003, "文件大小超过限制"),
+    INVALID_FILE_TYPE(2004, "文件类型不支持"),
     // 评论相关错误码 (3000-3999)
     COMMENT_NOT_FOUND(3001, "评论不存在");
     

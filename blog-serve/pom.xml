@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.2.4</version>
+		<version>3.3.8</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.zzt.blog</groupId>
@@ -19,6 +19,8 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<spring-cloud.version>2024.0.0</spring-cloud.version>
 		<spring-cloud-alibaba.version>2023.0.3.2</spring-cloud-alibaba.version>
+		<spring-ai.version>1.0.0-M5</spring-ai.version>
+
 	</properties>
 	<dependencyManagement>
 		<dependencies>
@@ -29,11 +31,22 @@
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
+			<dependency>
+				<groupId>org.springframework.ai</groupId>
+				<artifactId>spring-ai-bom</artifactId>
+				<version>${spring-ai.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
 	<dependencies>
-
+<!--		下面添加ai的依赖？-->
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-openai-spring-boot-starter</artifactId>
+		</dependency>
 
 <!--	hutool依赖-->
 		<dependency>
@@ -69,8 +82,17 @@
 			<version>0.11.5</version>
 			<scope>runtime</scope>
 		</dependency>
-
-		<!-- ... existing code ... -->
+<!--接入大模型依赖-->
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.8.2</version>
+		</dependency>
+		<dependency>
+			<groupId>com.squareup.okhttp3</groupId>
+			<artifactId>okhttp</artifactId>
+			<version>4.9.0</version>
+		</dependency>
 
 
 		<!-- Spring AOP依赖 -->
@@ -106,7 +128,7 @@
 			<scope>test</scope>
 		</dependency>
 
-
+<!--	数据库链接-->
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
@@ -148,7 +170,6 @@
 		</dependency>
 
 	</dependencies>
-
 
 	<build>
 		<plugins>

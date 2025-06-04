@@ -24,10 +24,17 @@ public class Result<T>  {
     // 时间戳
     private Date timestamp;
 
+    //session Id
+    private String sessionId;
+
     /**
      * 成功响应（无数据）
      */
     public static <T> Result<T> success() {
+        Result<T> result = new Result<>();
+        result.setCode(200);
+        result.setMessage("success");
+        result.setTimestamp(new Date());
         return success(null);
     }
     /**
@@ -52,13 +59,25 @@ public class Result<T>  {
         return result;
     }
     /**
-     * 成功响应（带有xml提示信息）
+     * 成功响应（
      */
     public static <T> Result<T> success(String message, T data) {
         Result<T> result = new Result<>();
         result.setCode(200);
         result.setMessage(message);
         result.setData(data);
+        result.setTimestamp(new Date());
+        return result;
+    }
+    /**
+     * 成功响应（
+     */
+    public static <T> Result<T> success(String message, T data, String sessionId) {
+        Result<T> result = new Result<>();
+        result.setCode(200);
+        result.setMessage(message);
+        result.setData(data);
+        result.setSessionId(sessionId);
         result.setTimestamp(new Date());
         return result;
     }

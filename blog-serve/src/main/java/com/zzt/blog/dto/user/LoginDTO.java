@@ -15,4 +15,6 @@ public class LoginDTO {
     private String password;
     @Parameter(description = "验证码", required = true)
     private String captcha;
+    @Parameter(description = "sessionId", required = true)
+    private String sessionId;
 }

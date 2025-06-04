@@ -7,6 +7,7 @@ import com.zzt.blog.service.RoleService;
 import com.zzt.blog.util.JwtUtils;
 import com.zzt.blog.util.Result;
 import com.zzt.blog.exception.ErrorCode;
+import com.zzt.blog.util.UserContext;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -99,6 +100,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             
             // 将认证信息设置到SecurityContext中
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            Long userIdFromToken = jwtUtils.getUserIdFromToken(jwt);
+            UserContext.setUserId(userIdFromToken);
         }
         
         filterChain.doFilter(request, response);

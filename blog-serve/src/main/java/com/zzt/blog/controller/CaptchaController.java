@@ -17,9 +17,9 @@ public class CaptchaController {
 
 
     @GetMapping("/generate")
-    public Result<String> generateCaptcha(HttpSession session) {
-        String sessionId = session.getId();
+    public Result<String> generateCaptcha( HttpSession httpSession) {
+        String sessionId = httpSession.getId();
         String captchaImage = captchaService.generateCaptcha(sessionId);
-        return Result.success(captchaImage);
+        return Result.success("验证码生成成功", captchaImage, sessionId);
     }
 }

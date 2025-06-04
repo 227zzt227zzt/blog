@@ -1,5 +1,7 @@
 package com.zzt.blog.service.Impl;
 
+
+
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -14,12 +16,16 @@ import com.zzt.blog.exception.BusinessException;
 import com.zzt.blog.exception.ErrorCode;
 import com.zzt.blog.mapper.UserMapper;
 import com.zzt.blog.service.UserService;
+import com.zzt.blog.vo.UserVO;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 
 import java.util.Date;
 import java.util.Map;
+import java.util.UUID;
 
 import static com.zzt.blog.util.PasswordUtils.hashPassword;
 import static com.zzt.blog.util.PasswordUtils.verifyPassword;
@@ -96,18 +102,39 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public void updateUser(UpdateUserDTO user) {
-        if (getById(user.getId()) == null) {
+    public User updateUser(UpdateUserDTO user) {
+        try  {
+            // 检查用户是否存在
+            if (getById(user.getId()) == null) {
+                throw new BusinessException(ErrorCode.USER_NOT_FOUND);
+            }
+            // 检查用户名是否已存在
+            if (this.lambdaQuery().eq(User::getUsername, user.getUsername())
+                    .ne(User::getId, user.getId())
+                    .exists()) {
+                throw new BusinessException(ErrorCode.USERNAME_ALREADY_EXISTS);
+                    }
+
+            // 检查邮箱是否已经注册
+            if (this.lambdaQuery().eq(User::getEmail, user.getEmail())
+                    .ne(User::getId, user.getId())
+                    .exists()) {
+                throw new BusinessException(ErrorCode.EMAIL_ALREADY_EXISTS);
+            }
+            // 更新用户信息
+            User newUser = new User();
+            BeanUtils.copyProperties(user, newUser);
+            newUser.setUpdateTime(new Date());
+            getBaseMapper().updateById(newUser);
+            // 返回更新后的用户信息
+            return newUser;
+          }
+        catch (Exception e) {
             throw new BusinessException(ErrorCode.USER_NOT_FOUND);
         }
-        if (user.getPassword() != null) {
-            user.setPassword(hashPassword(user.getPassword()));
-        }
-        User newUser = getById(user.getId());
-        BeanUtils.copyProperties(user, newUser);
-        newUser.setUpdateTime(new Date());
-        getBaseMapper().updateById(newUser);
+
     }
+
 
     @Override
     public void disableUser(Long userId) {
@@ -131,5 +158,61 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
         // 执行分页查询
         return baseMapper.selectPage(new Page<>(page, size), wrapper);
+    }
+
+    @Override
+    public String uploadAvatar(MultipartFile file, Long userId) {
+        // 检查用户是否存在
+        User user = getById(userId);
+        if (user == null) {
+            throw new BusinessException(ErrorCode.USER_NOT_FOUND);
+        }
+        // 检查文件是否为空
+        if (file.isEmpty()) {
+            throw new BusinessException(ErrorCode.PARAM_ERROR);
+        }
+        // 检查文件类型是否合法
+        String contentType = file.getContentType();
+        if (contentType == null || !contentType.startsWith("image/")) {
+            throw new BusinessException(ErrorCode.PARAM_ERROR);
+        }
+        // 保存文件到本地
+        String fileName = file.getOriginalFilename();
+        if (fileName == null) {
+            throw new BusinessException(ErrorCode.PARAM_ERROR);
+        }
+        String fileSuffix = fileName.substring(fileName.lastIndexOf("."));
+        
+        // 使用绝对路径存储文件
+        String uploadDir = "D:/project/blog/blog/blog-serve/upload/avatars";
+
+
+        // 确保上传目录存在
+        java.io.File dir = new java.io.File(uploadDir);
+        if (!dir.exists()) {
+            if (!dir.mkdirs()) {
+                throw new BusinessException(ErrorCode.SAVE_FILE_ERROR);
+            }
+        }
+        
+        // 生成文件名：时间戳_用户ID_随机UUID.后缀
+        String newFileName = System.currentTimeMillis() + "_" + userId + "_" + UUID.randomUUID() + fileSuffix;
+        String filePath = uploadDir + "/" + newFileName;
+        
+        try {
+            file.transferTo(new java.io.File(filePath));
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new BusinessException(ErrorCode.SAVE_FILE_ERROR);
+        }
+        
+        // 更新用户头像信息
+        String avatarUrl = "/upload/avatars/" + newFileName;
+        user.setAvatar(avatarUrl);
+        if (!updateById(user)) {
+            throw new BusinessException(ErrorCode.SAVE_FILE_ERROR);
+        }
+        
+        return "http://localhost:8082/"+avatarUrl;
     }
 }

@@ -2,6 +2,8 @@ package com.zzt.blog.controller;
 
 import com.zzt.blog.entity.Tags;
 import com.zzt.blog.service.TagService;
+import com.zzt.blog.util.Result;
+import com.zzt.blog.util.UserContext;
 import io.swagger.v3.oas.annotations.Operation;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -20,8 +22,8 @@ public class TagController {
 
     @GetMapping
     @Operation(summary = "获取所有标签")
-    public List<Tags> listTags() {
-        return tagService.listTags();
+    public Result<List<Tags>> listTags() {
+        return Result.success(tagService.listTags());
     }
 
     @GetMapping("/{id}")

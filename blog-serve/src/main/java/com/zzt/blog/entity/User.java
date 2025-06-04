@@ -32,5 +32,8 @@ public class User {
     private UserStatus status;
 
     private Date updateTime;
-
+    /**
+     * 昵称
+     */
+    private String nickname;
 }

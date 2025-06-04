@@ -19,7 +19,6 @@ public class RedisConfig {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration();
         config.setHostName("localhost");
         config.setPort(6379);
-        config.setPassword("123456");
         config.setDatabase(0);
         //启用 Redis Session 存储
         //Session 过期时间（秒）
