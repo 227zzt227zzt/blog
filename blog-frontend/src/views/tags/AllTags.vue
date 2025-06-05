@@ -9,7 +9,6 @@ const dialogVisible = ref(false)
 const dialogTitle = ref('')
 const form = ref({ id: null, name: '', description: '', color: '' })
 const isEdit = ref(false)
-
 const fetchTags = () => {
     loading.value = true
     listTags().then(res => {
@@ -88,7 +87,7 @@ const handleSubmit = () => {
     <el-table :data="tags" style="width: 100%" :loading="loading">
         <el-table-column label="标签名称">
             <template #default="scope">
-                <el-tag :style="{ backgroundColor: scope.row.color, color: '#fff', border: 'none' }">
+                <el-tag :style="{ backgroundColor: scope.row.color, color: '#fff', border: 'none', cursor: 'pointer', transition: 'background 0.2s' }">
                     {{ scope.row.name }}
                 </el-tag>
             </template>
@@ -123,6 +122,9 @@ const handleSubmit = () => {
 </template>
 
 <style scoped>
-
-
+/* 移除悬停效果，保持 el-tag 悬停和普通状态一致 */
+:deep(.el-tag) {
+  transition: none;
+}
 </style>
+

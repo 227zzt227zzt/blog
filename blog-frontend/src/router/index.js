@@ -25,6 +25,11 @@ const routes = [{
     component: () => import('@/views/tags/AllTags.vue')
   },
   {
+    path: '/community',
+    name: 'community',
+    component: () => import('@/views/community/CommunityView.vue')
+  },
+  {
     path: '/profile',
     name: 'profile',
     component: () => import('@/views/mine/ProfileView.vue'),

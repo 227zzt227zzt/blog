@@ -1,52 +1,44 @@
   <template>
     <div class="home-container">
-      <div class="header">
-        <div class="logo">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M19 22H5a3 3 0 0 1-3-3V3a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v12h4v4a3 3 0 0 1-3 3zm-1-5v2a1 1 0 0 0 2 0v-2h-2zM6 7v2h8V7H6zm0 4v2h8v-2H6zm0 4v2h5v-2H6z"/>
-          </svg>
-          <h1>博客系统</h1>
-        </div>
-        
-        <div class="user-info" v-if="userInfo">
-          <el-dropdown>
-            <span class="user-dropdown">
-              <el-avatar :size="36" :src="userInfo.avatar || 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'"></el-avatar>
-              <span>{{ userInfo.username }}</span>
-              <el-icon><ArrowDown /></el-icon>
+      <div :class="['navbar', { 'navbar-solid': navbarSolid }]">
+        <div class="navbar-logo">博客系统</div>
+        <div class="navbar-links">
+          <span class="nav-link" @click="goToHome">首页</span>
+          <span class="nav-link" @click="goToArticles">文章</span>
+          <span class="nav-link" @click="goToTags">标签</span>
+          <span class="nav-link" @click="goToAbout">关于我们</span>
+          <span class="nav-link" v-if="!userInfo" @click="goToLogin">登录</span>
+          <span class="nav-link" v-if="!userInfo" @click="goToRegister">注册</span>
+          <el-dropdown v-if="userInfo" class="nav-avatar-dropdown">
+            <span class="nav-avatar">
+              <el-avatar :size="32" :src="userInfo.avatar || 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'"></el-avatar>
+              <span class="nav-username">{{ userInfo.username }}</span>
             </span>
             <template #dropdown>
               <el-dropdown-menu>
                 <el-dropdown-item @click="goToProfile">个人中心</el-dropdown-item>
-                <el-dropdown-item>我的文章</el-dropdown-item>
-                <el-dropdown-item divided @click="logout">退出登录</el-dropdown-item>
+                <el-dropdown-item divided @click="logout">退出</el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
         </div>
-        <div v-else class="auth-buttons">
-          <el-button type="primary" @click="goToLogin" class="login-btn">登录</el-button>
-          <el-button @click="goToRegister" class="register-btn">注册</el-button>
-        </div>
       </div>
+      
       
       <div class="hero-section">
         <div class="hero-content">
           <h2>分享知识，连接思想</h2>
           <p class="subtitle">一个专注于技术分享与学习的平台</p>
+          <div id="text-container">
+            {{ currentText }}<span class="type-cursor"></span>
+          </div>
           <div class="cta-buttons">
             <el-button type="primary" size="large" @click="goToArticles">浏览文章</el-button>
             <el-button size="large" @click="goToCreate" v-if="userInfo">写文章</el-button>
-            <el-button size="primary" @click="goToTags">浏览标签</el-button>
+            <el-button type="primary" size="large" @click="goToTags">浏览标签</el-button>
           </div>
         </div>
-        <div class="hero-image">
-          <div class="image-placeholder">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M21 8v12.993A1 1 0 0 1 20.007 22H3.993A.993.993 0 0 1 3 21.008V2.992C3 2.455 3.449 2 4.002 2h10.995L21 8zm-2 1h-5V4H5v16h14V9zM8 7h3v2H8V7zm0 4h8v2H8v-2zm0 4h8v2H8v-2z"/>
-            </svg>
-          </div>
-        </div>
+        
       </div>
       
       <div class="features">
@@ -70,7 +62,7 @@
           <p>记录学习过程中的点点滴滴</p>
         </div>
         
-        <div class="feature-card">
+        <div class="feature-card" @click="goToCommunity" style="cursor:pointer;">
           <div class="icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
               <path d="M14 14.252V22H4a8 8 0 0 1 10-7.748zM12 13c-3.315 0-6-2.685-6-6s2.685-6 6-6 6 2.685 6 6-2.685 6-6 6zm6 4v-3h2v3h3v2h-3v3h-2v-3h-3v-2h3z"/>
@@ -110,15 +102,14 @@
   <script setup>
   import { useRouter } from 'vue-router'
   import { useUserStore } from '@/store/user'
-  import { computed } from 'vue'
-  import { ArrowDown, ChatDotRound, Pointer, Link } from '@element-plus/icons-vue'
+  import { computed, ref, onMounted, onUnmounted } from 'vue'
+  import {  ChatDotRound, Pointer, Link } from '@element-plus/icons-vue'
 
   const router = useRouter()
   const userStore = useUserStore()
 
   const userInfo = computed(() => userStore.userInfo)
   
-
   const logout = () => {
     userStore.clearUserInfo()
     router.push('/login')
@@ -147,16 +138,146 @@
   const goToTags = () => {
     router.push('/tags')
   }
+
+  function goToHome() {
+    router.push('/')
+  }
+
+  function goToAbout() {
+    // 这里可以跳转到关于我们页面，暂时用 alert 占位
+    alert('关于我们：这是一个专注于技术分享的博客平台。')
+  }
+
+  function goToCommunity() {
+    router.push('/community')
+  }
+
+  const navbarSolid = ref(false)
+
+  function handleScroll() {
+    navbarSolid.value = window.scrollY > 30
+  }
+
+  onMounted(() => {
+    window.addEventListener('scroll', handleScroll)
+  })
+  onUnmounted(() => {
+    window.removeEventListener('scroll', handleScroll)
+  })
+
+  // 打字机动画
+  const currentText = ref('')
+  const messages = [
+    '欢迎来到小技巧日常分享',
+    '这里有各种前端开发小技巧',
+    '分享HTML、CSS、JavaScript等知识'
+  ]
+  let currentIndex = 0
+  let charIndex = 0
+  let typing = true
+  let timer = null
+
+  function typeWriter() {
+    if (typing) {
+      if (charIndex < messages[currentIndex].length) {
+        currentText.value += messages[currentIndex][charIndex]
+        charIndex++
+        timer = setTimeout(typeWriter, 80)
+      } else {
+        typing = false
+        timer = setTimeout(typeWriter, 1200) // 停留一会再删除
+      }
+    } else {
+      if (charIndex > 0) {
+        currentText.value = currentText.value.slice(0, -1)
+        charIndex--
+        timer = setTimeout(typeWriter, 40)
+      } else {
+        typing = true
+        currentIndex = (currentIndex + 1) % messages.length
+        timer = setTimeout(typeWriter, 300)
+      }
+    }
+  }
+
+  onMounted(() => {
+    timer = setTimeout(typeWriter, 600)
+  })
+  onUnmounted(() => {
+    clearTimeout(timer)
+  })
   </script>
 
   <style scoped>
   .home-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
+    width: 100vw;
+    min-width: 0;
+    max-width: none;
+    margin: 0;
+    /* padding: 20px; */
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    background: url('../../assets/bgd.png') center center/cover no-repeat;
+    position: relative;
+  }
+
+  .home-container::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; right: 0; bottom: 0;
+    /* background: rgba(255,255,255,0.7);
+    z-index: 0; */
+    pointer-events: none;
+  }
+
+  .home-container > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .navbar {
+    width: 100%;
+    height: 60px;
+    background: rgba(255,255,255,0.0);
+    box-shadow: 0 2px 8px rgba(110,142,251,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    transition: background 0.4s cubic-bezier(.4,0,.2,1), box-shadow 0.4s cubic-bezier(.4,0,.2,1);
+  }
+
+  .navbar-solid {
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(110,142,251,0.08);
+  }
+
+  .navbar-logo {
+    font-size: 22px;
+    font-weight: bold;
+    color: #6e8efb;
+    letter-spacing: 2px;
+  }
+
+  .navbar-links {
+    display: flex;
+    gap: 28px;
+  }
+
+  .nav-link {
+    font-size: 16px;
+    color: #333;
+    cursor: pointer;
+    transition: color 0.2s;
+    position: relative;
+  }
+
+  .nav-link:hover {
+    color: #6e8efb;
   }
 
   .header {
@@ -184,36 +305,6 @@
     color: #333;
   }
 
-  .user-dropdown {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    padding: 5px 10px;
-    border-radius: 20px;
-    transition: background 0.3s;
-  }
-
-  .user-dropdown:hover {
-    background: #f5f7fa;
-  }
-
-  .auth-buttons {
-    display: flex;
-    gap: 12px;
-  }
-
-  .login-btn {
-    background: #6e8efb;
-    border-color: #6e8efb;
-  }
-
-  .register-btn {
-    background: #a777e3;
-    border-color: #a777e3;
-    color: white;
-  }
-
   .hero-section {
     display: flex;
     align-items: center;
@@ -224,25 +315,10 @@
 
   .hero-content {
     flex: 1;
-  }
-
-  .hero-content h2 {
-    font-size: 42px;
-    font-weight: 700;
-    line-height: 1.2;
-    color: #333;
-    margin-bottom: 20px;
-  }
-
-  .subtitle {
-    font-size: 18px;
-    color: #666;
-    margin-bottom: 30px;
-  }
-
-  .cta-buttons {
     display: flex;
-    gap: 15px;
+    flex-direction: column;
+    align-items: center;
+    
   }
 
   .hero-image {
@@ -265,6 +341,17 @@
     width: 150px;
     height: 150px;
     fill: rgba(255, 255, 255, 0.8);
+  }
+
+  .subtitle {
+    font-size: 18px;
+    color: #666;
+    margin-bottom: 30px;
+  }
+
+  .cta-buttons {
+    display: flex;
+    gap: 15px;
   }
 
   .features {
@@ -319,17 +406,22 @@
   .footer {
     margin-top: auto;
     background: #f9fafc;
-    border-radius: 16px;
+    border-radius: 0;
     padding: 40px 20px;
     margin-top: 60px;
+    max-width: none;
+    width: 100%;
   }
 
   .footer-content {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 40px;
-    max-width: 1200px;
-    margin: 0 auto;
+    max-width: none !important;
+    width: 100%;
+    margin: 0;
+    padding: 0 0 40px 0;
+    box-sizing: border-box;
   }
 
   .footer-section {
@@ -361,5 +453,52 @@
     border-top: 1px solid #eee;
     color: #999;
     font-size: 14px;
+  }
+
+  .nav-avatar-dropdown {
+    display: flex;
+    align-items: center;
+  }
+  .nav-avatar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    padding: 0 8px;
+  }
+  .nav-username {
+    font-size: 15px;
+    color: #333;
+  }
+
+  #text-container {
+    font-size: 24px;
+    color: #333;
+    min-height: 32px;
+    margin-bottom: 18px;
+    letter-spacing: 1px;
+    white-space: pre-wrap;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    width: auto;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow-wrap: break-word;
+    word-break: break-all;
+    overflow: visible;
+  }
+  .type-cursor {
+    display: inline-block;
+    width: 2px;
+    height: 1.2em;
+    background: #6e8efb;
+    margin-left: 2px;
+    animation: blink-cursor 0.8s steps(1) infinite;
+    vertical-align: middle;
+  }
+  @keyframes blink-cursor {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
   }
   </style>
