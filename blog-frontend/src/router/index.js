@@ -1,25 +1,33 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import {
+  createRouter,
+  createWebHistory
+} from 'vue-router'
 
-const routes = [
-  {
+const routes = [{
     path: '/',
     name: 'home',
-    component: () => import('@/views/HomeView.vue')
+    component: () => import('@/views/home/HomeView.vue')
   },
   {
     path: '/login',
     name: 'login',
-    component: () => import('@/views/LoginView.vue')
+    component: () => import('@/views/login/LoginView.vue')
   },
   {
     path: '/register',
     name: 'register',
-    component: () => import('@/views/RegisterView.vue')
+    component: () => import('@/views/register/RegisterView.vue')
+  },
+
+  {
+    path: '/tags',
+    name: 'tags',
+    component: () => import('@/views/tags/AllTags.vue')
   },
   {
     path: '/profile',
     name: 'profile',
-    component: () => import('@/views/ProfileView.vue'),
+    component: () => import('@/views/mine/ProfileView.vue'),
     meta: {
       requiresAuth: true
     }
@@ -27,17 +35,17 @@ const routes = [
   {
     path: '/articles',
     name: 'articles',
-    component: () => import('@/views/ArticlesView.vue')
+    component: () => import('@/views/article/ArticlesView.vue')
   },
   {
     path: '/article/:id',
     name: 'article',
-    component: () => import('@/views/ArticleContentView.vue')
+    component: () => import('@/views/article/ArticleContentView.vue')
   },
   {
     path: '/article/create',
     name: 'articleCreate',
-    component: () => import('@/views/ArticleCreateView.vue'),
+    component: () => import('@/views/article/ArticleCreateView.vue'),
     meta: {
       requiresAuth: true
     }
@@ -45,7 +53,7 @@ const routes = [
   {
     path: '/article/edit/:id',
     name: 'articleEdit',
-    component: () => import('@/views/ArticleEditView.vue'),
+    component: () => import('@/views/article/ArticleEditView.vue'),
     meta: {
       requiresAuth: true
     }
