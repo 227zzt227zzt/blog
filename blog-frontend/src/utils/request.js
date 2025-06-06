@@ -8,7 +8,8 @@ import {
 import router from '@/router';
 
 const service = axios.create({
-    baseURL: 'http://192.168.70.192:8080', // 后端服务地址
+    // baseURL: 'http://192.168.70.192:8080', // 小米热点后端服务地址'
+    baseURL: 'http://192.168.8.64:8080', //华为wifi后端地址
     timeout: 5000,
     withCredentials: true // 允许跨域请求携带凭证
 });

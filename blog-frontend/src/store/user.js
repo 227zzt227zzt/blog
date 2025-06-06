@@ -1,5 +1,9 @@
-import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import {
+  defineStore
+} from 'pinia'
+import {
+  ref
+} from 'vue'
 import CryptoJS from 'crypto-js'
 
 // 加密密钥，建议放在环境变量中
@@ -24,12 +28,12 @@ const decrypt = (encryptedData) => {
 export const useUserStore = defineStore('user', () => {
   const token = ref('')
   const userInfo = ref(null)
-  
+
   // 初始化时从 sessionStorage 获取数据
   const initFromStorage = () => {
     const storedUserInfo = sessionStorage.getItem('userInfo')
     // const storedRefreshToken = sessionStorage.getItem('refreshToken')
-    
+
     if (storedUserInfo) {
       try {
         const decryptedData = decrypt(storedUserInfo)
@@ -49,34 +53,34 @@ export const useUserStore = defineStore('user', () => {
 
   // 初始化
   initFromStorage()
-  
+
   const setUserInfo = (userData) => {
     // 设置 token
     token.value = userData.token
-    
+
     // 设置用户信息，添加过期时间（例如24小时）
     const userDataWithExpiry = {
       data: userData.user,
       token: userData.token,
       expires: Date.now() + 24 * 60 * 60 * 1000
     }
-    
+
     // 加密后存储
     const encryptedData = encrypt(userDataWithExpiry)
     sessionStorage.setItem('userInfo', encryptedData)
-    
+
     // 存储refresh token
     if (userData.refreshToken) {
       sessionStorage.setItem('refreshToken', userData.refreshToken)
     }
-    
+
     userInfo.value = userData.user
     //单独设置用户头像
     if (userData.user && userData.user.avatar) {
-      userInfo.value.avatar ="http://localhost:8082"+ userData.user.avatar
+      userInfo.value.avatar = "http://192.168.8.64:8080" + userData.user.avatar
     }
   }
-  
+
   const clearUserInfo = () => {
     token.value = ''
     userInfo.value = null
@@ -88,7 +92,7 @@ export const useUserStore = defineStore('user', () => {
   const isUserInfoValid = () => {
     return userInfo.value !== null && token.value !== ''
   }
-  
+
   return {
     token,
     userInfo,

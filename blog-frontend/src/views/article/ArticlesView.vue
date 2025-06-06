@@ -1,9 +1,7 @@
 <template>
   <div class="articles-container">
     <div class="header">
-      <el-button type="primary" @click="router.back()">
-        返回 
-      </el-button>
+      <el-button type="primary" @click="goToHome"> 返回 </el-button>
       <div class="logo">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -30,7 +28,7 @@
       >
         <div class="article-cover">
           <el-image
-            :src="'http://localhost:8082' + article.coverImage"
+            :src="article.coverImage || defaultCover"
             fit="cover"
             :preview-src-list="[]"
           >
@@ -79,6 +77,7 @@ import { useUserStore } from "@/store/user";
 import { ElMessage } from "element-plus";
 import { Plus, Calendar, View, Picture } from "@element-plus/icons-vue";
 import { getArticles } from "@/api/article";
+// import SectionView from "../community/SectionView.vue";
 
 const router = useRouter();
 const userStore = useUserStore();
@@ -133,6 +132,10 @@ const goToArticle = (id) => {
 
 const goToCreate = () => {
   router.push("/article/create");
+};
+
+const goToHome = () => {
+  router.push("/");
 };
 
 onMounted(() => {

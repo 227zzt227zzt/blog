@@ -30,6 +30,11 @@ const routes = [{
     component: () => import('@/views/community/CommunityView.vue')
   },
   {
+    path: '/community',
+    name: 'section',
+    component: () => import('@/views/community/SectionView.vue')
+  },
+  {
     path: '/profile',
     name: 'profile',
     component: () => import('@/views/mine/ProfileView.vue'),
