@@ -75,7 +75,6 @@ import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useUserStore } from "@/store/user";
 import { ElMessage } from "element-plus";
-import { Plus, Calendar, View, Picture } from "@element-plus/icons-vue";
 import { getArticles } from "@/api/article";
 // import SectionView from "../community/SectionView.vue";
 
